@@ -112,3 +112,111 @@
 
 <!-- CART BAR -->
 <div class="cart-bar" id="cartBar">
+  <div class="total">Total: ₹<span id="cartTotal">0</span></div>
+  <button class="whatsapp-btn" onclick="orderWhatsApp()">📲 Order on WhatsApp</button>
+</div>
+
+<!-- INFO -->
+<section class="info-section">
+  <div class="info-card">
+    <h3>📍 Find Us</h3>
+    <p>Mughal View Restaurant<br>Achabal, Anantnag, Kashmir</p>
+  </div>
+  <div class="info-card">
+    <h3>🕘 Opening Hours</h3>
+    <p>Monday – Sunday<br>9:00 AM – 9:00 PM</p>
+  </div>
+  <div class="info-card">
+    <h3>⭐ Why Us</h3>
+    <p>Famous for our signature Butter Chicken. Cozy Kashmiri ambiance, quick service, and views of the valley.</p>
+  </div>
+</section>
+
+<footer>© 2025 Mughal View Restaurant. All rights reserved.</footer>
+
+<div class="toast" id="toast">Item added!</div>
+
+<script>
+// ⚠️ REPLACE THIS with the restaurant's real WhatsApp number (country code + number, no + or spaces)
+const WHATSAPP_NUMBER = "910000000000"; 
+
+const menuItems = [
+  { name: "Butter Chicken", desc: "Our signature rich & creamy chicken", price: 320, cat: "mains" },
+  { name: "Rogan Josh", desc: "Traditional Kashmiri lamb curry", price: 350, cat: "mains" },
+  { name: "Chicken Kebab", desc: "Char-grilled, tender, spiced", price: 250, cat: "starters" },
+  { name: "Paneer Tikka", desc: "Marinated cottage cheese, grilled", price: 220, cat: "starters" },
+  { name: "Garlic Naan", desc: "Soft bread with garlic & butter", price: 60, cat: "breads" },
+  { name: "Kashmiri Pulao", desc: "Aromatic rice with dry fruits", price: 180, cat: "mains" },
+  { name: "Tandoori Roti", desc: "Whole wheat, tandoor baked", price: 30, cat: "breads" },
+  { name: "Kahwa Tea", desc: "Traditional saffron & almond tea", price: 80, cat: "drinks" },
+  { name: "Lassi", desc: "Sweet or salted, fresh yogurt", price: 90, cat: "drinks" },
+  { name: "Coffee", desc: "Freshly brewed", price: 100, cat: "drinks" }
+];
+
+let cart = {};
+
+function renderMenu(filter = 'all') {
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = "";
+  menuItems.filter(i => filter === 'all' || i.cat === filter).forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = "menu-item";
+    div.innerHTML = `
+      <div class="item-info">
+        <h3>${item.name}</h3>
+        <p>${item.desc}</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="item-price">₹${item.price}</span>
+        <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">+</button>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function filterMenu(cat) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderMenu(cat);
+}
+
+function addToCart(name, price) {
+  if (cart[name]) cart[name].qty++;
+  else cart[name] = { price, qty: 1 };
+  updateCart();
+  showToast();
+}
+
+function updateCart() {
+  let total = 0, count = 0;
+  for (let k in cart) { total += cart[k].price * cart[k].qty; count += cart[k].qty; }
+  document.getElementById('cartTotal').textContent = total;
+  const bar = document.getElementById('cartBar');
+  if (count > 0) bar.classList.add('show');
+  else bar.classList.remove('show');
+}
+
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+function orderWhatsApp() {
+  let msg = "Hello Mughal View Restaurant!%0A%0AI'd like to order:%0A";
+  let total = 0;
+  for (let k in cart) {
+    let subtotal = cart[k].price * cart[k].qty;
+    total += subtotal;
+    msg += `- ${k} x${cart[k].qty} = ₹${subtotal}%0A`;
+  }
+  msg += `%0A*Total: ₹${total}*%0A%0APlease confirm my order. Thank you!`;
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+}
+
+// Init
+renderMenu();
+</script>
+</body>
+	    </html>
